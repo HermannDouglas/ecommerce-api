@@ -179,8 +179,21 @@ def get_cart():
             "product_name": product.name,
             "product_price": product.price,
         })
-        
+
     return jsonify(cart_content)
+
+
+@app.route('/api/cart/checkout', methods=['POST'])
+@login_required
+def checkout():
+    user = User.query.get(int(current_user.id))
+    cart_items = user.cart
+    if cart_items:
+        for cart_item in cart_items:
+            db.session.delete(cart_item)
+        db.session.commit()
+        return jsonify({'message': 'Checkout successful. Cart has been checkout.'})
+    return jsonify({'message': 'No items in the cart'}), 400
 
 
 if __name__ == '__main__':
